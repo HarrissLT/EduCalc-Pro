@@ -64,7 +64,7 @@ const AIAdvisor: React.FC<AIAdvisorProps> = ({ currentResult, calculatorType }) 
           )}
 
           {advice && (
-            <div className="prose prose-invert prose-sm max-w-none animate-in fade-in duration-700">
+            <div className="prose prose-invert prose-sm max-w-none animate-fade-in">
               <ReactMarkdown>{advice}</ReactMarkdown>
               <button 
                 onClick={handleGetAdvice}

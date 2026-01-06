@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Trophy, Medal } from 'lucide-react';
+import { Trophy, Medal, Info, Calculator, ChevronRight } from 'lucide-react';
 import katex from 'katex';
 
 export const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden ${className}`}>
+  <div className={`glass-card rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/60 ${className}`}>
     {children}
   </div>
 );
@@ -17,9 +17,11 @@ export const InputGroup: React.FC<{
   max?: number;
   suffix?: string;
 }> = ({ label, value, onChange, placeholder = '0.0', type = 'number', max = 10, suffix }) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-sm font-medium text-slate-600 ml-1">{label}</label>
-    <div className="relative">
+  <div className="group flex flex-col gap-2">
+    <label className="text-sm font-semibold text-slate-600 ml-1 flex items-center gap-1 group-focus-within:text-blue-600 transition-colors">
+      {label}
+    </label>
+    <div className="relative transform transition-all duration-200 group-focus-within:-translate-y-0.5">
       <input
         type={type}
         max={max}
@@ -27,11 +29,11 @@ export const InputGroup: React.FC<{
         step="0.1"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-800 font-medium placeholder-slate-400"
+        className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-slate-800 font-bold placeholder-slate-300 shadow-sm"
         placeholder={placeholder}
       />
       {suffix && (
-        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 bg-slate-100 px-2 py-1 rounded-md text-slate-500 text-xs font-bold uppercase tracking-wider">
           {suffix}
         </span>
       )}
@@ -46,50 +48,73 @@ export const ResultBox: React.FC<{
 }> = ({ result, label, subtext }) => {
   if (result === null) return null;
 
-  let colorClass = 'text-slate-700';
-  let bgClass = 'bg-slate-50';
+  let colorClass = 'text-slate-700 from-slate-500 to-slate-700';
+  let bgClass = 'bg-slate-50 border-slate-200';
+  let icon = <Calculator className="w-6 h-6 text-slate-400" />;
   
-  if (result >= 8.0) { colorClass = 'text-emerald-600'; bgClass = 'bg-emerald-50 border-emerald-100'; }
-  else if (result >= 6.5) { colorClass = 'text-blue-600'; bgClass = 'bg-blue-50 border-blue-100'; }
-  else if (result >= 5.0) { colorClass = 'text-orange-600'; bgClass = 'bg-orange-50 border-orange-100'; }
-  else { colorClass = 'text-rose-600'; bgClass = 'bg-rose-50 border-rose-100'; }
+  if (result >= 8.0) { 
+    colorClass = 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600'; 
+    bgClass = 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100';
+    icon = <Trophy className="w-6 h-6 text-emerald-500" />;
+  }
+  else if (result >= 6.5) { 
+    colorClass = 'text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600'; 
+    bgClass = 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100'; 
+    icon = <Medal className="w-6 h-6 text-blue-500" />;
+  }
+  else if (result >= 5.0) { 
+    colorClass = 'text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-600'; 
+    bgClass = 'bg-gradient-to-br from-orange-50 to-amber-50 border-orange-100'; 
+    icon = <Medal className="w-6 h-6 text-orange-500" />;
+  }
+  else { 
+    colorClass = 'text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-pink-600'; 
+    bgClass = 'bg-gradient-to-br from-rose-50 to-pink-50 border-rose-100'; 
+    icon = <Info className="w-6 h-6 text-rose-500" />;
+  }
 
   return (
-    <div className={`mt-6 p-6 rounded-xl border ${bgClass} text-center animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-      <p className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-2">{label}</p>
-      <div className={`text-5xl font-bold ${colorClass} tracking-tight`}>
-        {result.toFixed(2)}
+    <div className={`mt-8 p-8 rounded-3xl border shadow-sm ${bgClass} text-center animate-slide-in-bottom relative overflow-hidden group`}>
+      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
+        {React.cloneElement(icon as React.ReactElement<any>, { size: 120 })}
       </div>
-      {subtext && <p className="mt-2 text-slate-600 font-medium">{subtext}</p>}
+      
+      <p className="relative z-10 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">{label}</p>
+      
+      <div className="relative z-10 flex items-center justify-center">
+        <div className={`text-7xl md:text-8xl font-black tracking-tighter ${colorClass} drop-shadow-sm`}>
+          {result.toFixed(2)}
+        </div>
+      </div>
+      
+      {subtext && (
+        <div className="relative z-10 mt-4 inline-block px-4 py-1.5 rounded-full bg-white/60 backdrop-blur-sm border border-white/50 shadow-sm">
+          <p className="text-slate-600 font-medium text-sm">{subtext}</p>
+        </div>
+      )}
     </div>
   );
 };
 
 export const AchievementBanner: React.FC<{ score: number; type: 'semester' | 'year' }> = ({ score, type }) => {
-  // Check if score is >= 8.0 for Excellent Student
   if (score < 8.0) return null;
 
   return (
-    <div className="mt-6 relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 shadow-lg shadow-orange-100 animate-in zoom-in duration-500 ring-2 ring-offset-2 ring-yellow-200">
-      {/* Decorative circles */}
-      <div className="absolute -top-4 -right-4 w-24 h-24 bg-white opacity-20 rounded-full blur-xl"></div>
-      <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-yellow-200 opacity-20 rounded-full blur-xl"></div>
-
-      <div className="p-1">
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 flex items-center gap-4 relative z-10 text-white border border-white/20">
-            <div className="bg-white/20 p-3 rounded-full shrink-0 shadow-inner">
-                <Trophy size={32} className="text-yellow-50 drop-shadow-md" />
+    <div className="mt-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 shadow-xl shadow-orange-500/20 animate-zoom-in">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+      
+      <div className="relative z-10 p-1">
+        <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20 flex flex-col sm:flex-row items-center gap-5 text-white">
+            <div className="bg-gradient-to-br from-white to-orange-50 p-4 rounded-full shadow-lg">
+                <Trophy size={32} className="text-amber-500" />
             </div>
-            <div className="flex-1">
-                <h4 className="font-bold text-lg leading-tight drop-shadow-sm">
-                    {type === 'year' ? 'Chúc Mừng HS Giỏi Cả Năm! 🎉' : 'Chúc Mừng HS Giỏi Học Kỳ! 🏆'}
+            <div className="text-center sm:text-left flex-1">
+                <h4 className="font-bold text-xl leading-tight drop-shadow-md">
+                    {type === 'year' ? 'Xuất Sắc! Học Sinh Giỏi Cả Năm 🎉' : 'Tuyệt Vời! Học Sinh Giỏi Học Kỳ 🏆'}
                 </h4>
-                <p className="text-yellow-50 text-sm mt-1 font-medium opacity-95">
-                    Điểm tổng kết {score.toFixed(2)}. Bạn quá xuất sắc!
+                <p className="text-amber-50 text-sm mt-1.5 font-medium opacity-95 leading-relaxed">
+                    Điểm tổng kết <span className="font-bold text-white text-lg">{score.toFixed(2)}</span>. Bạn đã nỗ lực rất nhiều!
                 </p>
-            </div>
-            <div className="hidden sm:block opacity-30 rotate-12">
-                <Medal size={48} />
             </div>
         </div>
       </div>
@@ -97,30 +122,15 @@ export const AchievementBanner: React.FC<{ score: number; type: 'semester' | 'ye
   );
 };
 
-// Internal component to render Latex
 const LatexRenderer: React.FC<{ latex: string }> = ({ latex }) => {
   const [html, setHtml] = useState('');
-
   useEffect(() => {
     try {
-      // Use renderToString to avoid DOM access and quirks mode checks
-      const rendered = katex.renderToString(latex, {
-        throwOnError: false,
-        displayMode: true,
-      });
+      const rendered = katex.renderToString(latex, { throwOnError: false, displayMode: true });
       setHtml(rendered);
-    } catch (e) {
-      console.error("KaTeX rendering error", e);
-      setHtml(latex); // Fallback to raw text
-    }
+    } catch (e) { setHtml(latex); }
   }, [latex]);
-
-  return (
-    <div 
-      className="overflow-x-auto overflow-y-hidden py-1"
-      dangerouslySetInnerHTML={{ __html: html }} 
-    />
-  );
+  return <div className="overflow-x-auto py-2" dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
 export const FormulaGuide: React.FC<{
@@ -129,30 +139,37 @@ export const FormulaGuide: React.FC<{
   explanation: string;
   tips: string[];
 }> = ({ title, formula, explanation, tips }) => (
-  <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 mt-8 space-y-4">
-    <div className="flex items-center gap-2">
-      <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
-      <h3 className="font-semibold text-slate-800">{title}</h3>
+  <div className="mt-10 group">
+    <div className="flex items-center gap-3 mb-4">
+       <div className="p-2 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+          <Info size={18} />
+       </div>
+       <h3 className="font-bold text-slate-800 text-lg">{title}</h3>
     </div>
     
-    <div className="bg-white p-2 rounded-lg border border-slate-100 shadow-sm text-slate-700">
-      <LatexRenderer latex={formula} />
-    </div>
-    
-    <p className="text-sm text-slate-600 leading-relaxed">
-      <span className="font-semibold text-slate-700">Cách tính: </span>
-      {explanation}
-    </p>
-
-    <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
-      <p className="text-xs font-bold text-amber-600 uppercase mb-2 flex items-center gap-1">
-        💡 Mẹo nhỏ
+    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-lg shadow-slate-200/50 hover:shadow-xl transition-shadow">
+      <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 mb-4">
+        <LatexRenderer latex={formula} />
+      </div>
+      
+      <p className="text-slate-600 leading-relaxed mb-6">
+        <span className="font-bold text-slate-800">Giải thích: </span>
+        {explanation}
       </p>
-      <ul className="list-disc list-inside space-y-1">
-        {tips.map((tip, idx) => (
-          <li key={idx} className="text-sm text-slate-700">{tip}</li>
-        ))}
-      </ul>
+
+      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-100/50">
+        <p className="text-xs font-bold text-amber-600 uppercase mb-3 flex items-center gap-2">
+          <span>💡</span> Bí kíp đạt điểm cao
+        </p>
+        <ul className="space-y-2">
+          {tips.map((tip, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+              <ChevronRight size={14} className="mt-1 text-amber-400 shrink-0" />
+              <span>{tip}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   </div>
 );

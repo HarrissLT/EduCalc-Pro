@@ -6,7 +6,6 @@ import { CalculatorType } from '../types';
 
 // --- Subject Average Calculator ---
 export const SubjectAvgCalc: React.FC<{ onResultChange: (val: number) => void }> = ({ onResultChange }) => {
-  // Default 4 slots for regular tests (Oral, 15m x 3 is common)
   const [regulars, setRegulars] = useState<string[]>(['', '', '', '']);
   const [midterm, setMidterm] = useState<string>('');
   const [final, setFinal] = useState<string>('');
@@ -22,10 +21,8 @@ export const SubjectAvgCalc: React.FC<{ onResultChange: (val: number) => void }>
       return;
     }
 
-    // Regular coeff 1, Midterm coeff 2, Final coeff 3
     const sum = regScores.reduce((a, b) => a + b, 0) + (midScore * 2) + (finalScore * 3);
     const totalCoeff = regScores.length + 2 + 3;
-    
     const avg = sum / totalCoeff;
     setResult(avg);
     onResultChange(avg);
@@ -34,18 +31,19 @@ export const SubjectAvgCalc: React.FC<{ onResultChange: (val: number) => void }>
   useEffect(() => { calculate(); }, [regulars, midterm, final]);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-6">
-        <div className="space-y-3 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-          <label className="text-sm font-bold text-blue-800 ml-1 block mb-2">
-            1. Điểm Hệ Số 1 (Kiểm tra Miệng, 15 phút)
+    <div className="space-y-8">
+      <div className="space-y-6">
+        <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100/50">
+          <label className="text-sm font-bold text-slate-700 block mb-4 flex items-center gap-2">
+             <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">1</span>
+             Điểm Hệ Số 1 (Kiểm tra Miệng, 15 phút)
           </label>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-4">
             {regulars.map((score, idx) => (
-              <div key={idx} className="relative w-20">
+              <div key={idx} className="relative w-24 group">
                 <input
                   type="number"
-                  className="w-full px-3 py-2.5 bg-white border border-blue-200 rounded-lg text-center focus:ring-2 focus:ring-blue-500 outline-none font-medium shadow-sm"
+                  className="w-full px-2 py-3 bg-white border border-slate-200 rounded-xl text-center focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-lg shadow-sm transition-all"
                   value={score}
                   onChange={(e) => {
                     const newRegs = [...regulars];
@@ -57,31 +55,31 @@ export const SubjectAvgCalc: React.FC<{ onResultChange: (val: number) => void }>
                 {regulars.length > 1 && (
                     <button 
                         onClick={() => setRegulars(regulars.filter((_, i) => i !== idx))}
-                        className="absolute -top-2 -right-2 bg-rose-100 text-rose-500 rounded-full p-0.5 hover:bg-rose-200 shadow-sm"
+                        className="absolute -top-2 -right-2 bg-white text-rose-500 border border-rose-100 rounded-full p-1 opacity-0 group-hover:opacity-100 shadow-md transition-opacity hover:bg-rose-50"
                         title="Xóa điểm này"
                     >
-                        <X size={12} />
+                        <X size={12} strokeWidth={3} />
                     </button>
                 )}
               </div>
             ))}
             <button
               onClick={() => setRegulars([...regulars, ''])}
-              className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-dashed border-blue-300 text-blue-400 hover:border-blue-500 hover:text-blue-600 transition-colors bg-white"
+              className="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-dashed border-slate-300 text-slate-400 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all"
               title="Thêm cột điểm"
             >
-              <Plus size={20} />
+              <Plus size={24} />
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InputGroup label="2. Điểm Giữa Kỳ (Hệ số 2)" value={midterm} onChange={setMidterm} placeholder="Bài 1 tiết/GK..." />
-          <InputGroup label="3. Điểm Cuối Kỳ (Hệ số 3)" value={final} onChange={setFinal} placeholder="Bài thi HK..." />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <InputGroup label="2. Điểm Giữa Kỳ (Hệ số 2)" value={midterm} onChange={setMidterm} placeholder="0.0" />
+          <InputGroup label="3. Điểm Cuối Kỳ (Hệ số 3)" value={final} onChange={setFinal} placeholder="0.0" />
         </div>
       </div>
 
-      <ResultBox result={result} label="Điểm Trung Bình Môn" subtext={result && result >= 5 ? "Đã qua môn! Chúc mừng bạn 🎉" : "Cần cố gắng thêm xíu nữa! 💪"} />
+      <ResultBox result={result} label="Điểm Trung Bình Môn" subtext={result && result >= 5 ? "Đã qua môn! Chúc mừng bạn 🎉" : "Cố gắng hơn ở kỳ sau nhé! 💪"} />
       <FormulaGuide {...FORMULAS[CalculatorType.SUBJECT_AVG]} />
     </div>
   );
@@ -106,14 +104,14 @@ export const YearlyAvgCalc: React.FC<{ onResultChange: (val: number) => void }> 
   }, [sem1, sem2]);
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-        <InputGroup label="Điểm TB Học Kỳ 1" value={sem1} onChange={setSem1} placeholder="Ví dụ: 7.5" />
+    <div className="space-y-8 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-end bg-slate-50/50 p-8 rounded-3xl border border-slate-100">
+        <InputGroup label="Học Kỳ 1" value={sem1} onChange={setSem1} placeholder="Ví dụ: 7.5" suffix="HS 1" />
         <div className="relative">
-             <InputGroup label="Điểm TB Học Kỳ 2" value={sem2} onChange={setSem2} suffix="x2" placeholder="Ví dụ: 8.0" />
-             <div className="absolute -top-6 right-0 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 animate-bounce">
-                Quan trọng!
+             <div className="absolute -top-8 left-0 text-xs font-bold text-emerald-600 bg-emerald-100/50 px-3 py-1 rounded-full border border-emerald-100 animate-bounce">
+                Hệ số 2
              </div>
+             <InputGroup label="Học Kỳ 2" value={sem2} onChange={setSem2} suffix="HS 2" placeholder="Ví dụ: 8.0" />
         </div>
       </div>
       <ResultBox result={result} label="Điểm Tổng Kết Cả Năm" />
@@ -148,22 +146,29 @@ export const TargetScoreCalc: React.FC<{ onResultChange: (val: number) => void }
   }, [currentAvg, target, weight, currentWeight]);
 
   return (
-    <div className="space-y-6">
-      <div className="bg-rose-50 border border-rose-100 p-4 rounded-xl mb-4 text-sm text-rose-800">
-        Bạn muốn biết bài thi cuối kỳ cần bao nhiêu điểm để được <b>Học Sinh Giỏi (8.0)</b>? Nhập số liệu bên dưới nhé!
+    <div className="space-y-8">
+      <div className="bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-100 p-6 rounded-2xl text-rose-800 flex gap-4">
+        <span className="text-2xl">🎯</span>
+        <div>
+            <p className="font-bold mb-1">Tính điểm mục tiêu</p>
+            <p className="text-sm opacity-80">Bạn muốn biết bài thi cuối kỳ cần bao nhiêu điểm để được <b>Học Sinh Giỏi (8.0)</b>? Nhập số liệu bên dưới nhé!</p>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <InputGroup label="Điểm trung bình hiện có" value={currentAvg} onChange={setCurrentAvg} placeholder="Ví dụ: 7.2" />
         <InputGroup label="Mục tiêu tổng kết" value={target} onChange={setTarget} placeholder="Ví dụ: 8.0" />
       </div>
       
-      <div className="grid grid-cols-2 gap-6 p-5 bg-slate-50 rounded-xl border border-slate-200">
-        <div className="col-span-2 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-            <span className="text-sm font-bold text-slate-600 uppercase">Cấu hình hệ số (Mặc định)</span>
+      <div className="p-6 bg-slate-50/80 rounded-2xl border border-slate-200/60">
+        <div className="flex items-center gap-2 mb-6">
+            <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Cấu hình hệ số</span>
         </div>
-        <InputGroup label="Tổng hệ số đã có" value={currentWeight} onChange={setCurrentWeight} placeholder="Thường là 7 hoặc 12" />
-        <InputGroup label="Hệ số bài thi sắp tới" value={weight} onChange={setWeight} placeholder="Thường là 3 (Thi HK)" />
+        <div className="grid grid-cols-2 gap-8">
+            <InputGroup label="Tổng hệ số đã có" value={currentWeight} onChange={setCurrentWeight} placeholder="7 hoặc 12" />
+            <InputGroup label="Hệ số bài sắp thi" value={weight} onChange={setWeight} placeholder="Thường là 3" />
+        </div>
       </div>
 
       <ResultBox 
@@ -176,7 +181,7 @@ export const TargetScoreCalc: React.FC<{ onResultChange: (val: number) => void }
   );
 };
 
-// --- Semester Average Calculator (Simple List) ---
+// --- Semester Average Calculator ---
 export const SemesterAvgCalc: React.FC<{ onResultChange: (val: number) => void }> = ({ onResultChange }) => {
     const [math, setMath] = useState('');
     const [lit, setLit] = useState('');
@@ -188,13 +193,11 @@ export const SemesterAvgCalc: React.FC<{ onResultChange: (val: number) => void }
         const m = parseFloat(math) || 0;
         const l = parseFloat(lit) || 0;
         const e = parseFloat(eng) || 0;
-        
         const otherScores = others.map(s => parseFloat(s)).filter(n => !isNaN(n));
         
         let totalScore = 0;
         let totalCoeff = 0;
 
-        // Default coefficients for Main subjects (Toan, Van, Anh often x2)
         if (math) { totalScore += m * 2; totalCoeff += 2; }
         if (lit) { totalScore += l * 2; totalCoeff += 2; }
         if (eng) { totalScore += e * 2; totalCoeff += 2; }
@@ -211,16 +214,15 @@ export const SemesterAvgCalc: React.FC<{ onResultChange: (val: number) => void }
         } else {
             setResult(null);
         }
-
     }, [math, lit, eng, others]);
 
     return (
-        <div className="space-y-8">
-            <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-                <p className="text-sm font-semibold text-indigo-800 mb-3 flex items-center gap-2">
+        <div className="space-y-10">
+            <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100/50">
+                <p className="text-sm font-bold text-indigo-800 mb-6 flex items-center gap-2 uppercase tracking-wider">
                     📚 Các Môn Chính (Hệ số 2)
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <InputGroup label="Toán" value={math} onChange={setMath} suffix="x2" />
                     <InputGroup label="Ngữ Văn" value={lit} onChange={setLit} suffix="x2" />
                     <InputGroup label="Tiếng Anh" value={eng} onChange={setEng} suffix="x2" />
@@ -228,8 +230,10 @@ export const SemesterAvgCalc: React.FC<{ onResultChange: (val: number) => void }
             </div>
             
             <div>
-                <p className="text-sm font-semibold text-slate-700 mb-3 ml-1">🧪 Các Môn Khác (Hệ số 1 - Lý, Hóa, Sinh, Sử, Địa...)</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <p className="text-sm font-bold text-slate-700 mb-4 ml-1 flex items-center gap-2 uppercase tracking-wider">
+                    🧪 Các Môn Khác (Hệ số 1)
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {others.map((val, idx) => (
                         <div key={idx} className="relative">
                             <input
@@ -240,16 +244,16 @@ export const SemesterAvgCalc: React.FC<{ onResultChange: (val: number) => void }
                                     newOthers[idx] = e.target.value;
                                     setOthers(newOthers);
                                 }}
-                                className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-blue-500 outline-none transition-shadow hover:shadow-sm"
+                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-center focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all shadow-sm font-medium"
                                 placeholder={`Môn ${idx + 1}`}
                             />
                         </div>
                     ))}
                     <button
                         onClick={() => setOthers([...others, ''])}
-                        className="flex items-center justify-center px-3 py-2.5 border border-dashed border-slate-300 rounded-lg text-slate-500 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-all"
+                        className="flex items-center justify-center px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-all"
                     >
-                        <Plus size={18} className="mr-1" /> Thêm
+                        <Plus size={20} className="mr-1" /> Thêm môn
                     </button>
                 </div>
             </div>
