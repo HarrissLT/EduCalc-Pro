@@ -1,22 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize Gemini Client
-// IMPORTANT: The API key is sourced from process.env.API_KEY as per strict guidelines.
-const getClient = () => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    console.error("API Key not found in environment variables.");
-    return null;
-  }
-  return new GoogleGenAI({ apiKey });
-};
-
 export const getStudyAdvice = async (
   context: string,
   scores: Record<string, any>
 ): Promise<string> => {
-  const client = getClient();
-  if (!client) return "Vui lòng cấu hình API Key để sử dụng tính năng AI.";
+  // Initialize Gemini Client
+  // API key is sourced from process.env.API_KEY as per strict guidelines.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   try {
     const prompt = `
@@ -30,7 +20,7 @@ export const getStudyAdvice = async (
       Định dạng kết quả bằng Markdown.
     `;
 
-    const response = await client.models.generateContent({
+    const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
